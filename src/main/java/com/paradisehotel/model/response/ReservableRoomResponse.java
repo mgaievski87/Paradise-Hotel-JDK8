@@ -1,6 +1,7 @@
 package com.paradisehotel.model.response;
 
 
+import com.paradisehotel.entity.RoomType;
 import com.paradisehotel.model.Links;
 
 public class ReservableRoomResponse {
@@ -9,16 +10,20 @@ public class ReservableRoomResponse {
     private Integer roomNumber;
     private Integer price;
     private Boolean isAvailable;
+    private RoomType roomType;
+    private String description;
     private Links links;
     private String resMsg = "ok";
 
     public ReservableRoomResponse() {
     }
 
-    public ReservableRoomResponse(Integer roomNumber, Integer price, Boolean isAvailable) {
+    public ReservableRoomResponse(Integer roomNumber, Integer price, Boolean isAvailable, RoomType roomType, String description) {
         this.roomNumber = roomNumber;
         this.price = price;
         this.isAvailable = isAvailable;
+        this.roomType = roomType;
+        this.description = description;
     }
 
     public void setId(Long id) {
@@ -63,11 +68,27 @@ public class ReservableRoomResponse {
         isAvailable = available;
     }
 
+    public RoomType getRoomType() {
+        return roomType;
+    }
+
+    public void setRoomType(RoomType roomType) {
+        this.roomType = roomType;
+    }
+
     public String getResMsg() {
         return resMsg;
     }
 
     public void setResMsg(String resMsg) {
         this.resMsg = resMsg;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

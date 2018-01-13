@@ -32,17 +32,17 @@
           </div>
           <h1>Book a Room</h1>
           <form class="form-horizontal" [formGroup]="roomsearch"
-          (ngSubmit)="onSubmit(roomsearch)">
+          (ngSubmit)="searchRooms(currentPageNumber, currentPageSize, currentSort)">
             <div class="form-group">
               <label for="checkin" class="col-4">Check-In:</label>
               <div class="col-8">
-                <input id="checkin" type="date" class="form-control" formControlName="checkin" />
+                <input id="checkin" type="date" name="checkinDate" [ngModel]="checkinDate | date: 'yyyy-MM-dd'" class="form-control" formControlName="checkin" />
               </div>
             </div>
             <div class="form-group">
               <label for="checkout" class="col-4">Check-Out:</label>
               <div class="col-8">
-                <input id="checkout" type="date" class="form-control" formControlName="checkout" />
+                <input id="checkout" type="date" name="checkoutDate" [ngModel]="checkoutDate | date: 'yyyy-MM-dd'" class="form-control" formControlName="checkout" />
               </div>
             </div>
             <div class="form-group">
@@ -65,25 +65,56 @@
       </div>
 
       <h1>Available Rooms</h1>
-      <div class="row" *ngIf="bookingResultMessage">
-      <h2>{{bookingResultMessage}}</h2>
-      </div>
-      <div class="row" *ngIf="rooms">
+      <!--
+      <div class="row">
         <div class="col-12">
           <div class="table-responsive">
             <table class="table">
               <tbody>
-              <tr *ngFor="let room of rooms">
+                <tr>
+                  <td>
+                    <div class="room_thumb_container-bookedOut">
+                      <img class="room_thumb_img-bookedOut" src="src/app/images/intro_room.jpg">
+                      <h3 class="room_thumb_text-bookedOut">Booked Out</h3>
+                    </div>
+                  </td>
+                  <td>
+                    Room #: 405
+                  </td>
+                  <td>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      -->
+
+      <div class="row" *ngIf="bookingResultMessage">
+      <h2>{{bookingResultMessage}}</h2>
+      </div>
+      <div class="row" *ngIf="roomsPage">
+        <div class="col-12">
+          <div class="table-responsive">
+            <table class="table">
+              <tbody>
+              <tr *ngFor="let room of roomsPage.content">
                 <td>
-                  <img src="src/app/images/intro_room.jpg" alt="Intro Gallery Room Sample Pictures">
+                  <div [ngClass]="{'room_thumb_container-bookedOut': !room.available}">
+                    <img [ngClass]="{'room_thumb_img-bookedOut': !room.available}" src="src/app/images/intro_room.jpg" alt="Intro Gallery Room Sample Pictures">
+                    <h3 *ngIf="!room.available" [ngClass]="{'room_thumb_text-bookedOut': !room.available}">Booked Out</h3>
+                  </div>
                 </td>
                 <td>
                   <strong>Room #: {{room.roomNumber}}</strong><br />
+                  <strong>Type: {{room.roomType}}</strong><br />
                   <strong>Price: ${{room.price}}</strong>
                 </td>
                 <td>
                   <!-- <div>{{bookingResultMessage}}</div>-->
-                  <button type="submit" class="btn btn-primary" (click)="reserveRoom(room.id)">Reserve</button>
+                  <button type="submit" class="btn btn-primary" *ngIf="room.available" (click)="reserveRoom(room.id)">Reserve</button>
                 </td>
               </tr>
               </tbody>
@@ -91,6 +122,11 @@
           </div>
         </div>
       </div>
+      <!-- Inserting Pagination component 'rooms-pagination.component' -->
+      <div class="row" *ngIf="self">
+        <app-rooms-pagination [table]="self" [page]="roomsPage"></app-rooms-pagination>
+      </div>
+
     </article>
   </div><!-- welcome -->
   <div class="scene" id="hotelinfo">

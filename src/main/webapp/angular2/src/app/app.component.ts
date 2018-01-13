@@ -1,24 +1,34 @@
 import { Component, OnInit } from '@angular/core';
 import {FormControl, FormGroup} from '@angular/forms';
-import {Http, RequestOptions, Response, Headers} from '@angular/http';
+import {Http, URLSearchParams, RequestOptions, Response, Headers} from '@angular/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {Observable} from 'rxjs/Observable';
+import {PaginationPage, PaginationPropertySort} from './pagination';
+import {Table} from './table';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, Table<Room> {
 
-  private baseUrl: string = 'http://localhost:8080';
+  private baseUrl = 'http://localhost:8080';
   public submitted: boolean;
   roomsearch: FormGroup;
-  rooms: Room[];
+  roomsPage: PaginationPage<Room>;
+  self: Table<Room>;
+  isSelfSetup: boolean = false;
+  checkinDate: Date;
+  checkoutDate: Date;
   currentCheckInVal: string;
   currentCheckOutVal: string;
   currentShowParamVal: string;
+  currentPageNumber: number;
+  currentPageSize: number;
+  currentSort: PaginationPropertySort;
+
   request: ReserveRoomRequest;
   bookingResultMessage: string;
 
@@ -30,6 +40,10 @@ export class AppComponent implements OnInit {
       checkout: new FormControl(''),
       showParam: new FormControl('availableOnly')
     });
+    // Setting the default value;
+    this.checkinDate = new Date();
+    this.checkoutDate = new Date();
+    this.checkoutDate.setDate(new Date().getDate() + 1);
 
     const roomsearchValueChanges$ = this.roomsearch.valueChanges;
 
@@ -38,42 +52,65 @@ export class AppComponent implements OnInit {
       this.currentCheckOutVal = valChange.checkout;
       this.currentShowParamVal = valChange.showParam;
     });
+
+    this.currentPageNumber = 0;
+    this.currentPageSize = 5;
+    this.currentSort = null;
+
   }
 
-  onSubmit({value, valid}: {value: Roomsearch, valid: boolean}) {
-    this.getAll()
+  //onSubmit({value, valid}: {value: Roomsearch, valid: boolean}) {
+  searchRooms(pageNumber: number, pageSize: number, sort: PaginationPropertySort) {
+    this.bookingResultMessage = undefined;
+    this.getAll(pageNumber, pageSize, sort)
       .subscribe(
-        rooms => this.rooms = rooms,
+        roomsPage => {
+          const rooms = roomsPage.content;
+          if (rooms.length > 0 && rooms[0].resMsg !== 'ok') {
+            this.bookingResultMessage = rooms[0].resMsg;
+          } else {
+            this.roomsPage = roomsPage;
+            if (!this.isSelfSetup) {
+              this.self = this;
+              this.isSelfSetup = true;
+            }
+          }
+        },
         err => {
           console.log(err);
+          this.bookingResultMessage = 'Please, make sure you specify check-in and check-out dates correctly.';
         }
       );
+  }
+
+  getAll(pageNumber: number, pageSize: number, sort: PaginationPropertySort): Observable<PaginationPage<Room>> {
+    console.log('getAll is called.');
+    let params = new URLSearchParams();
+    params.set('size', `${pageSize}`);
+    params.set('page', `${pageNumber}`);
+    if (sort !== null) {
+      params.set('sort', `${sort.property},${sort.direction}`);
+    }
+    let options = new RequestOptions({
+      search: params
+    });
+    return this.http.get(this.baseUrl + '/room/reservation/v1?checkin=' + this.currentCheckInVal + '&checkout=' + this.currentCheckOutVal + '&showParam=' + this.currentShowParamVal, options)
+      .map(this.mapRoom);
+
+  }
+  mapRoom(response: Response): PaginationPage<Room> {
+    return response.json();
   }
 
   reserveRoom(value: string) {
     this.request = new ReserveRoomRequest(value, this.currentCheckInVal, this.currentCheckOutVal);
     this.createReservation(this.request);
   }
-
-  getAll(): Observable<Room[]> {
-    //console.log('currentCheckInVal: ' + this.currentCheckInVal);
-    //console.log('currentCheckOutVal: ' + this.currentCheckOutVal);
-
-    return this.http.get(`${this.baseUrl}/room/reservation/v1
-    ?checkin=${this.currentCheckInVal}
-    &checkout=${this.currentCheckOutVal}
-    &showParam=${this.currentShowParamVal}`)
-      .map(this.mapRoom);
-
-  }
-
   createReservation(body: ReserveRoomRequest) {
-    let bodyString = JSON.stringify(body);
-    let headers = new Headers({'Content-Type': 'application/json'});
-    let option = new RequestOptions({headers: headers});
-
-
-    let postRequest = this.http.post(this.baseUrl + '/room/reservation/v1', body, option);
+    const bodyString = JSON.stringify(body);
+    const headers = new Headers({'Content-Type': 'application/json'});
+    const option = new RequestOptions({headers: headers});
+    const postRequest = this.http.post(this.baseUrl + '/room/reservation/v1', body, option);
     postRequest.map(res => res.json())
       .subscribe(res => {
         console.log(res);
@@ -87,9 +124,6 @@ export class AppComponent implements OnInit {
 
   }
 
-  mapRoom(response: Response): Room[] {
-    return response.json().content;
-  }
 }
 export interface Roomsearch {
   checkin: string;
@@ -101,8 +135,11 @@ export class Room {
   id: string;
   roomNumber: string;
   price: string;
+  roomType: string;
+  description: string;
+  available: boolean;
+  resMsg: string;
   links: string;
-
 }
 
 export class ReserveRoomRequest {

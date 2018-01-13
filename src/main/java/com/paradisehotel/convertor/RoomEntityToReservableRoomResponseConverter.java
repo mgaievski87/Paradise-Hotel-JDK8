@@ -28,6 +28,8 @@ public class RoomEntityToReservableRoomResponseConverter implements Converter<Ro
         ReservableRoomResponse reservationResponse = new ReservableRoomResponse();
         reservationResponse.setRoomNumber(source.getRoomNumber());
         reservationResponse.setPrice(Integer.valueOf(source.getPrice()));
+        reservationResponse.setRoomType(source.getRoomType());
+        reservationResponse.setDescription(source.getRoomType().getDescription());
 
         Links links = new Links();
         Self self= new Self();

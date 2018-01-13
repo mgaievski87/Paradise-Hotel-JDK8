@@ -1,3 +1,6 @@
+
+
+
 @import url(http://fonts.googleapis.com/css?family=Exo+2:400,200,600,800);
 /* line 5, ../../../../../.rvm/gems/ruby-2.1.2/gems/compass-core-1.0.0.rc.1/stylesheets/compass/reset/_utilities.scss */
 html, body, div, span, applet, object, iframe,
@@ -937,3 +940,23 @@ footer #socialmedia ul li img {
 }
 
 /*# sourceMappingURL=style.css.map */
+
+.room_thumb_container-bookedOut {
+  display: inline-block;
+  background-color: rgba(50,153,84, 1.0);
+  position: relative;
+}
+.room_thumb_img-bookedOut {
+  opacity: 0.4;
+}
+.room_thumb_text-bookedOut {
+  color: white;
+  top: calc(50% - calc(1em/2));
+  width: 100%;
+  text-align: center;
+  position: absolute;
+  z-index: 1;
+  font: bold 2vw Arial;
+  margin: 0 auto;
+}
+

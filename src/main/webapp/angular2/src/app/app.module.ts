@@ -4,10 +4,12 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
+import { RoomsPaginationComponent } from './rooms-pagination/rooms-pagination.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    RoomsPaginationComponent
   ],
   imports: [
     BrowserModule,

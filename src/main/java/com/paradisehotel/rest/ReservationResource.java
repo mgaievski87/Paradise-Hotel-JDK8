@@ -1,5 +1,7 @@
 package com.paradisehotel.rest;
 
+import com.paradisehotel.convertor.Filters;
+import com.paradisehotel.convertor.RoomEntityListPage;
 import com.paradisehotel.convertor.RoomEntityToReservableRoomResponseConverter;
 import com.paradisehotel.entity.ReservationEntity;
 import com.paradisehotel.entity.RoomEntity;
@@ -11,9 +13,7 @@ import com.paradisehotel.repository.ReservationRepository;
 import com.paradisehotel.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,9 +24,6 @@ import java.time.LocalDate;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import static com.paradisehotel.rest.ResourceConstants.ROOM_RESERVATION_V1;
 
@@ -70,30 +67,20 @@ public class ReservationResource {
             return new PageImpl<>(Arrays.asList(reservableRoomResponse));
         }
         //----Validation End----
+
         //Return available and unavailable rooms
-        if(showParam.equals("All")) {
+        if(showParam.toLowerCase().equals("all")) {
             Page<RoomEntity> roomEntityList = pageableRoomRepository.findAll(pageable);
             return roomEntityList.map(new RoomEntityToReservableRoomResponseConverter(checkin, checkout));
         }
+
         //Filtering out unavailable rooms and returning only available ones.
-        Iterable<RoomEntity> roomEntityList = roomRepository.findAll();
-        Stream<RoomEntity> roomEntityStream = StreamSupport.stream(roomEntityList.spliterator(),false);
-        List<RoomEntity> filteredRoomEntityList = roomEntityStream.filter(roomEntity -> {
-                for (ReservationEntity reservationEntity : roomEntity.getReservationEntityList()) {
-                    if(!checkin.isBefore(reservationEntity.getCheckin()) && checkin.isBefore(reservationEntity.getCheckout())
-                            || checkout.isAfter(reservationEntity.getCheckin()) && !checkout.isAfter(reservationEntity.getCheckout())
-                            || checkin.isBefore(reservationEntity.getCheckin()) && checkout.isAfter(reservationEntity.getCheckout()))
-                        return false;
-                }
-                return true;
-        }).collect(Collectors.toList());
+        List<RoomEntity> filteredRoomEntityList = Filters.getAvailableRoomList(roomRepository, checkin, checkout);
 
         if(pageable == null)
             return new PageImpl<>(filteredRoomEntityList).map(new RoomEntityToReservableRoomResponseConverter());
 
-        final int currentTotal = pageable.getOffset() + pageable.getPageSize();
-        return new PageImpl<>(filteredRoomEntityList, pageable, currentTotal).map(new RoomEntityToReservableRoomResponseConverter());
-
+        return new RoomEntityListPage(filteredRoomEntityList, pageable).getPage().map(new RoomEntityToReservableRoomResponseConverter());
     }
 
     @RequestMapping(path = "/{roomId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -122,7 +109,7 @@ public class ReservationResource {
         }
         if(!reservationRequest.getCheckin().isBefore(reservationRequest.getCheckout())){
             reservationResponse = new ReservationResponse();
-            reservationResponse.setResMsg("Checkout date is supposed to be after checking date. PLease correct the dates.");
+            reservationResponse.setResMsg("Checkout date is supposed to be after checking date. Please correct the dates.");
             return new ResponseEntity<ReservationResponse>(reservationResponse, HttpStatus.OK);
         }
         for(ReservationEntity existingReservation : roomEntity.getReservationEntityList())
@@ -134,7 +121,7 @@ public class ReservationResource {
                     && reservationRequest.getCheckout().isAfter(reservationRequest.getCheckout())){
                 reservationResponse = new ReservationResponse();
                 reservationResponse.setRoomNumber(roomEntity.getRoomNumber());
-                reservationResponse.setResMsg("Room #"+roomEntity.getRoomNumber()+"is not available for this period");
+                reservationResponse.setResMsg("Room #"+roomEntity.getRoomNumber()+" is not available for this period");
                 return new ResponseEntity<ReservationResponse>(reservationResponse, HttpStatus.OK);
             }
         //End - Validation
