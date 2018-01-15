@@ -25,21 +25,22 @@ public class RoomEntityToReservableRoomResponseConverter implements Converter<Ro
     @Override
     public ReservableRoomResponse convert(RoomEntity source) {
 
-        ReservableRoomResponse reservationResponse = new ReservableRoomResponse();
-        reservationResponse.setRoomNumber(source.getRoomNumber());
-        reservationResponse.setPrice(Integer.valueOf(source.getPrice()));
-        reservationResponse.setRoomType(source.getRoomType());
-        reservationResponse.setDescription(source.getRoomType().getDescription());
+        ReservableRoomResponse reservableRoomResponse = new ReservableRoomResponse();
+        reservableRoomResponse.setRoomNumber(source.getRoomNumber());
+        reservableRoomResponse.setPrice(Integer.valueOf(source.getPrice()));
+        reservableRoomResponse.setRoomType(source.getRoomType());
+        reservableRoomResponse.setDescription(source.getRoomType().getDescription());
+        reservableRoomResponse.setImgURL(source.getRoomType().getImgURL());
 
         Links links = new Links();
         Self self= new Self();
         self.setRef(ResourceConstants.ROOM_RESERVATION_V1 + "/" + source.getId());
         links.setSelf(self);
-        reservationResponse.setLinks(links);
+        reservableRoomResponse.setLinks(links);
 
-        reservationResponse.setId(source.getId());
+        reservableRoomResponse.setId(source.getId());
 
-        reservationResponse.setAvailable(true);
+        reservableRoomResponse.setAvailable(true);
         //if empty constructor was called,
         // then 'isAvailable' field will be set to 'true' for all of the rooms
         if(this.checkin != null && this.checkout != null) {
@@ -47,9 +48,9 @@ public class RoomEntityToReservableRoomResponseConverter implements Converter<Ro
                 if(!this.checkin.isBefore(reservationEntity.getCheckin()) && this.checkin.isBefore(reservationEntity.getCheckout())
                         || this.checkout.isAfter(reservationEntity.getCheckin()) && !this.checkout.isAfter(reservationEntity.getCheckout())
                         || this.checkin.isBefore(reservationEntity.getCheckin()) && this.checkout.isAfter(reservationEntity.getCheckout()))
-                    reservationResponse.setAvailable(false);
+                    reservableRoomResponse.setAvailable(false);
             }
         }
-        return reservationResponse;
+        return reservableRoomResponse;
     }
 }

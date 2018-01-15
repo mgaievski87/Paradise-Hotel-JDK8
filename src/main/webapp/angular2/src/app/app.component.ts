@@ -29,8 +29,11 @@ export class AppComponent implements OnInit, Table<Room> {
   currentPageSize: number;
   currentSort: PaginationPropertySort;
 
+  reservedRoomsBuffer: Array<number>;
+
   request: ReserveRoomRequest;
   bookingResultMessage: string;
+
 
   constructor(private http: Http) {}
 
@@ -38,12 +41,15 @@ export class AppComponent implements OnInit, Table<Room> {
     this.roomsearch = new FormGroup({
       checkin: new FormControl(''),
       checkout: new FormControl(''),
-      showParam: new FormControl('availableOnly')
+      showParam: new FormControl('availableOnly'),
+      sortBy: new FormControl('price,asc'),
+      pageSize: new FormControl('10')
     });
-    // Setting the default value;
+    // Setting the default values
     this.checkinDate = new Date();
     this.checkoutDate = new Date();
     this.checkoutDate.setDate(new Date().getDate() + 1);
+    this.currentPageNumber = 0;
 
     const roomsearchValueChanges$ = this.roomsearch.valueChanges;
 
@@ -51,17 +57,18 @@ export class AppComponent implements OnInit, Table<Room> {
       this.currentCheckInVal = valChange.checkin;
       this.currentCheckOutVal = valChange.checkout;
       this.currentShowParamVal = valChange.showParam;
+      this.currentPageSize = valChange.pageSize;
+      this.currentSort = {
+        property: valChange.sortBy.split(',')[0],
+        direction: valChange.sortBy.split(',')[1]
+      };
     });
-
-    this.currentPageNumber = 0;
-    this.currentPageSize = 5;
-    this.currentSort = null;
 
   }
 
-  //onSubmit({value, valid}: {value: Roomsearch, valid: boolean}) {
   searchRooms(pageNumber: number, pageSize: number, sort: PaginationPropertySort) {
     this.bookingResultMessage = undefined;
+    this.reservedRoomsBuffer = []; // Cleaning the buffer
     this.getAll(pageNumber, pageSize, sort)
       .subscribe(
         roomsPage => {
@@ -84,7 +91,7 @@ export class AppComponent implements OnInit, Table<Room> {
   }
 
   getAll(pageNumber: number, pageSize: number, sort: PaginationPropertySort): Observable<PaginationPage<Room>> {
-    console.log('getAll is called.');
+
     let params = new URLSearchParams();
     params.set('size', `${pageSize}`);
     params.set('page', `${pageNumber}`);
@@ -103,6 +110,7 @@ export class AppComponent implements OnInit, Table<Room> {
   }
 
   reserveRoom(value: string) {
+    this.reservedRoomsBuffer.push(parseInt(value));
     this.request = new ReserveRoomRequest(value, this.currentCheckInVal, this.currentCheckOutVal);
     this.createReservation(this.request);
   }
@@ -124,6 +132,10 @@ export class AppComponent implements OnInit, Table<Room> {
 
   }
 
+  showReserveBtn(roomId: number) {
+      return !this.reservedRoomsBuffer.includes(roomId);
+  }
+
 }
 export interface Roomsearch {
   checkin: string;
@@ -137,6 +149,7 @@ export class Room {
   price: string;
   roomType: string;
   description: string;
+  imgURL: string;
   available: boolean;
   resMsg: string;
   links: string;

@@ -12,18 +12,20 @@ public class ReservableRoomResponse {
     private Boolean isAvailable;
     private RoomType roomType;
     private String description;
+    private String imgURL;
     private Links links;
     private String resMsg = "ok";
 
     public ReservableRoomResponse() {
     }
 
-    public ReservableRoomResponse(Integer roomNumber, Integer price, Boolean isAvailable, RoomType roomType, String description) {
+    public ReservableRoomResponse(Integer roomNumber, Integer price, Boolean isAvailable, RoomType roomType, String description, String imgURL) {
         this.roomNumber = roomNumber;
         this.price = price;
         this.isAvailable = isAvailable;
         this.roomType = roomType;
         this.description = description;
+        this.imgURL = imgURL;
     }
 
     public void setId(Long id) {
@@ -90,5 +92,13 @@ public class ReservableRoomResponse {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getImgURL() {
+        return imgURL;
+    }
+
+    public void setImgURL(String imgURL) {
+        this.imgURL = imgURL;
     }
 }

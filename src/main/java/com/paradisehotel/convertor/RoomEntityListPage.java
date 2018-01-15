@@ -15,8 +15,12 @@ public class RoomEntityListPage {
         this.pageable = pageable;
     }
     public PageImpl<RoomEntity> getPage(){
+        //Validation
+        if(content == null || pageable == null)
+            return new PageImpl<RoomEntity>(content);
         //Sorting
-        if (pageable.getSort() != null)
+        if (pageable.getSort() != null){
+            System.out.println(pageable.getSort().toString());
             Collections.sort(content, (o1, o2) -> {
                 String property = pageable.getSort().toString().split(",")[0].split(":")[0].toLowerCase();
                 String direction = pageable.getSort().toString().split(",")[0].split(":")[1].trim().toLowerCase();
@@ -42,10 +46,10 @@ public class RoomEntityListPage {
                 }
                 return 0;
             });
+        }
         //Sorting End
         int start = pageable.getOffset();
         int end = (start + pageable.getPageSize()) > content.size() ? content.size() : (start + pageable.getPageSize());
-        System.out.println(pageable.getSort().toString());
         return new PageImpl<>(content.subList(start, end), pageable, content.size());
     }
 
