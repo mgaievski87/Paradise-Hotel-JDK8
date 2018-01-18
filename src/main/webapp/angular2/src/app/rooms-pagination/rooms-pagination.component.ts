@@ -14,7 +14,6 @@ export class RoomsPaginationComponent implements OnInit, OnChanges {
   @Input() table: Table<any>;
   @Input() page: PaginationPage<any>;
   pagesIndexes: Array<number> = [];
-  nextLabel: string = 'Next>';
 
   ngOnInit() {}
 

@@ -10,7 +10,7 @@ import {Table} from './table';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css', '../styles/spinner.css']
 })
 export class AppComponent implements OnInit, Table<Room> {
 
@@ -34,6 +34,7 @@ export class AppComponent implements OnInit, Table<Room> {
   request: ReserveRoomRequest;
   bookingResultMessage: string;
 
+  showSpinner: boolean;
 
   constructor(private http: Http) {}
 
@@ -50,6 +51,7 @@ export class AppComponent implements OnInit, Table<Room> {
     this.checkoutDate = new Date();
     this.checkoutDate.setDate(new Date().getDate() + 1);
     this.currentPageNumber = 0;
+    this.showSpinner = false;
 
     const roomsearchValueChanges$ = this.roomsearch.valueChanges;
 
@@ -67,11 +69,15 @@ export class AppComponent implements OnInit, Table<Room> {
   }
 
   searchRooms(pageNumber: number, pageSize: number, sort: PaginationPropertySort) {
+
+    this.showSpinner = true;
     this.bookingResultMessage = undefined;
     this.reservedRoomsBuffer = []; // Cleaning the buffer
+
     this.getAll(pageNumber, pageSize, sort)
       .subscribe(
         roomsPage => {
+          this.showSpinner = false;
           const rooms = roomsPage.content;
           if (rooms.length > 0 && rooms[0].resMsg !== 'ok') {
             this.bookingResultMessage = rooms[0].resMsg;
@@ -84,6 +90,7 @@ export class AppComponent implements OnInit, Table<Room> {
           }
         },
         err => {
+          this.showSpinner = false;
           console.log(err);
           this.bookingResultMessage = 'Please, make sure you specify check-in and check-out dates correctly.';
         }
@@ -110,6 +117,7 @@ export class AppComponent implements OnInit, Table<Room> {
   }
 
   reserveRoom(value: string) {
+    this.showSpinner = true;
     this.reservedRoomsBuffer.push(parseInt(value));
     this.request = new ReserveRoomRequest(value, this.currentCheckInVal, this.currentCheckOutVal);
     this.createReservation(this.request);
@@ -121,10 +129,12 @@ export class AppComponent implements OnInit, Table<Room> {
     const postRequest = this.http.post(this.baseUrl + '/room/reservation/v1', body, option);
     postRequest.map(res => res.json())
       .subscribe(res => {
+        this.showSpinner = false;
         console.log(res);
         this.bookingResultMessage = `${res.resMsg}`;
     },
     err => {
+      this.showSpinner = false;
       console.log(err);
       this.bookingResultMessage = `Unfortunately, the booking service is temporary unavailable`;
     }
@@ -133,7 +143,7 @@ export class AppComponent implements OnInit, Table<Room> {
   }
 
   showReserveBtn(roomId: number) {
-      return !this.reservedRoomsBuffer.includes(roomId);
+      return this.reservedRoomsBuffer.indexOf(roomId) < 0;
   }
 
 }

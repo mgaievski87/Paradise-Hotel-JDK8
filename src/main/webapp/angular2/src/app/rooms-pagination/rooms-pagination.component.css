@@ -1,11 +1,15 @@
 .pagination {
   list-style-type: none;
-  margin: 0;
+  width: 90%;
+  margin: 0 auto;
   padding: 0;
-  display: inline-block;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-around;
+
 }
 .pagination_item {
-  display: inline;
+
 }
 .pagination_item_link {
   color: black;
@@ -33,4 +37,10 @@ pointer-events: none;
 }
 .unclickable .pagination_item_link {
   border: none;
+}
+
+@media (min-width: 768px) {
+  .pagination {
+    width: 50%;
+  }
 }
