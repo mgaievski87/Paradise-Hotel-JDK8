@@ -9,6 +9,7 @@ import { RoomsPaginationComponent } from './rooms-pagination/rooms-pagination.co
 import {SlideShowComponent} from './slide-show/slide-show.component';
 import {GalleryComponent} from './gallery/gallery.component';
 import {MapComponent} from './map/map.component';
+import {EnquireFormComponent} from './enquire-form/enquire-form.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import {MapComponent} from './map/map.component';
     RoomsPaginationComponent,
     SlideShowComponent,
     GalleryComponent,
-    MapComponent
+    MapComponent,
+    EnquireFormComponent
   ],
   imports: [
     BrowserModule,

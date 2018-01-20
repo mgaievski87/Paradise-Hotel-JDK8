@@ -1,5 +1,4 @@
 import {Component} from '@angular/core';
-import { AgmCoreModule } from '@agm/core';
 
 @Component({
   selector: 'app-map',
@@ -8,6 +7,6 @@ import { AgmCoreModule } from '@agm/core';
 })
 
 export class MapComponent {
-  lat: number = 51.678418;
-  lng: number = 7.809007;
+  lat: number = 49.2331;
+  lng: number = 28.4682;
 }
