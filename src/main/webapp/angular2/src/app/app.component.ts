@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import {FormControl, FormGroup} from '@angular/forms';
-import {Http, URLSearchParams, RequestOptions, Response, Headers} from '@angular/http';
+import {Component, OnInit} from '@angular/core';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {Http, URLSearchParams, RequestOptions, Headers} from '@angular/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {Observable} from 'rxjs/Observable';
@@ -17,9 +17,10 @@ export class AppComponent implements OnInit, Table<Room> {
   private baseUrl = 'http://localhost:8080';
   public submitted: boolean;
   roomsearch: FormGroup;
+  roomReserve: FormGroup;
   roomsPage: PaginationPage<Room>;
   self: Table<Room>;
-  isSelfSetup: boolean = false;
+  isSelfSetup = false;
   checkinDate: Date;
   checkoutDate: Date;
   currentCheckInVal: string;
@@ -28,33 +29,43 @@ export class AppComponent implements OnInit, Table<Room> {
   currentPageNumber: number;
   currentPageSize: number;
   currentSort: PaginationPropertySort;
-
+  currentRoomId: number;
+  currentClientFirstName: string;
+  currentClientLastName: string;
+  currentClientEmail: string;
+  currentClientPhone: string;
   reservedRoomsBuffer: Array<number>;
-
   request: ReserveRoomRequest;
   bookingResultMessage: string;
-
+  searchResultMessage: string;
   showSpinner: boolean;
+  showBookingSection = false;
 
   constructor(private http: Http) {}
 
   ngOnInit() {
     this.roomsearch = new FormGroup({
-      checkin: new FormControl(''),
-      checkout: new FormControl(''),
+      checkin: new FormControl('', [Validators.required]),
+      checkout: new FormControl('', [Validators.required]),
       showParam: new FormControl('availableOnly'),
       sortBy: new FormControl('price,asc'),
       pageSize: new FormControl('10')
     });
-    // Setting the default values
+    this.roomReserve = new FormGroup({
+      clientFirstName: new FormControl('', [Validators.required]),
+      clientLastName: new FormControl('', [Validators.required]),
+      clientEmail: new FormControl('', [Validators.required]),
+      clientPhone: new FormControl('', [Validators.required])
+    });
+    // Setting the default values that we display in the form
     this.checkinDate = new Date();
     this.checkoutDate = new Date();
     this.checkoutDate.setDate(new Date().getDate() + 1);
     this.currentPageNumber = 0;
     this.showSpinner = false;
-
+    // Keeping track of any changes in the forms
     const roomsearchValueChanges$ = this.roomsearch.valueChanges;
-
+    const roomReserveValueChanges$ = this.roomReserve.valueChanges;
     roomsearchValueChanges$.subscribe(valChange => {
       this.currentCheckInVal = valChange.checkin;
       this.currentCheckOutVal = valChange.checkout;
@@ -65,13 +76,18 @@ export class AppComponent implements OnInit, Table<Room> {
         direction: valChange.sortBy.split(',')[1]
       };
     });
-
+    roomReserveValueChanges$.subscribe(valChange => {
+      this.currentClientFirstName = valChange.clientFirstName;
+      this.currentClientLastName = valChange.clientLastName;
+      this.currentClientEmail = valChange.clientEmail;
+      this.currentClientPhone = valChange.clientPhone;
+    });
   }
 
   searchRooms(pageNumber: number, pageSize: number, sort: PaginationPropertySort) {
 
     this.showSpinner = true;
-    this.bookingResultMessage = undefined;
+    this.searchResultMessage = undefined;
     this.reservedRoomsBuffer = []; // Cleaning the buffer
 
     this.getAll(pageNumber, pageSize, sort)
@@ -80,25 +96,30 @@ export class AppComponent implements OnInit, Table<Room> {
           this.showSpinner = false;
           const rooms = roomsPage.content;
           if (rooms.length > 0 && rooms[0].resMsg !== 'ok') {
-            this.bookingResultMessage = rooms[0].resMsg;
+            //Displaying error message from server if any occured
+            this.searchResultMessage = rooms[0].resMsg;
+            this.showBookingSection = true;
           } else {
+            //In this case everything is ok on the server and 'roomsPage' gets populated with data
+            this.showBookingSection = false;
             this.roomsPage = roomsPage;
             if (!this.isSelfSetup) {
               this.self = this;
               this.isSelfSetup = true;
             }
+            //window.scrollTo(0, 0);
           }
         },
         err => {
           this.showSpinner = false;
+          this.showBookingSection = true;
           console.log(err);
-          this.bookingResultMessage = 'Please, make sure you specify check-in and check-out dates correctly.';
+          this.searchResultMessage = 'Please, make sure you specify check-in and check-out dates correctly.';
         }
       );
   }
 
   getAll(pageNumber: number, pageSize: number, sort: PaginationPropertySort): Observable<PaginationPage<Room>> {
-
     let params = new URLSearchParams();
     params.set('size', `${pageSize}`);
     params.set('page', `${pageNumber}`);
@@ -109,17 +130,14 @@ export class AppComponent implements OnInit, Table<Room> {
       search: params
     });
     return this.http.get(this.baseUrl + '/room/reservation/v1?checkin=' + this.currentCheckInVal + '&checkout=' + this.currentCheckOutVal + '&showParam=' + this.currentShowParamVal, options)
-      .map(this.mapRoom);
+      .map(response => response.json());
 
   }
-  mapRoom(response: Response): PaginationPage<Room> {
-    return response.json();
-  }
 
-  reserveRoom(value: string) {
+  reserveRoom(roomId: string) {
     this.showSpinner = true;
-    this.reservedRoomsBuffer.push(parseInt(value));
-    this.request = new ReserveRoomRequest(value, this.currentCheckInVal, this.currentCheckOutVal);
+    this.reservedRoomsBuffer.push(parseInt(roomId));
+    this.request = new ReserveRoomRequest(roomId, this.currentCheckInVal, this.currentCheckOutVal, this.currentClientFirstName, this.currentClientLastName, this.currentClientEmail, this.currentClientPhone);
     this.createReservation(this.request);
   }
   createReservation(body: ReserveRoomRequest) {
@@ -139,18 +157,23 @@ export class AppComponent implements OnInit, Table<Room> {
       this.bookingResultMessage = `Unfortunately, the booking service is temporary unavailable`;
     }
     );
-
   }
 
-  showReserveBtn(roomId: number) {
-      return this.reservedRoomsBuffer.indexOf(roomId) < 0;
+  isInBuffer(roomId: number) {
+      return this.reservedRoomsBuffer.indexOf(roomId) >= 0;
   }
-
-}
-export interface Roomsearch {
-  checkin: string;
-  checkout: string;
-  showParam: string;
+  setCurrentRoomId(roomId: number) {
+    this.currentRoomId = roomId;
+  }
+  showReservationForm(roomId: number) {
+    return roomId === this.currentRoomId;
+  }
+  resetReservationForm() {
+    this.currentRoomId = null;
+  }
+  toggleBookingSection() {
+    this.showBookingSection = !this.showBookingSection;
+  }
 }
 
 export class Room {
@@ -169,13 +192,25 @@ export class ReserveRoomRequest {
   roomId: string;
   checkin: string;
   checkout: string;
+  clientFirstName: string;
+  clientLastName: string;
+  clientEmail: string;
+  clientPhone: string;
   constructor(
     roomId: string,
     checkin: string,
-    checkout: string
+    checkout: string,
+    clientFirstName: string,
+    clientLastName: string,
+    clientEmail: string,
+    clientPhone: string
   ) {
       this.roomId = roomId;
       this.checkin = checkin;
       this.checkout = checkout;
+      this.clientFirstName = clientFirstName;
+      this.clientLastName = clientLastName;
+      this.clientEmail = clientEmail;
+      this.clientPhone = clientPhone;
     }
 }

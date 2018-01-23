@@ -3,11 +3,13 @@ package com.paradisehotel.rest;
 import com.paradisehotel.convertor.Filters;
 import com.paradisehotel.convertor.RoomEntityListPage;
 import com.paradisehotel.convertor.RoomEntityToReservableRoomResponseConverter;
+import com.paradisehotel.entity.ClientEntity;
 import com.paradisehotel.entity.ReservationEntity;
 import com.paradisehotel.entity.RoomEntity;
 import com.paradisehotel.model.request.ReservationRequest;
 import com.paradisehotel.model.response.ReservableRoomResponse;
 import com.paradisehotel.model.response.ReservationResponse;
+import com.paradisehotel.repository.ClientRepository;
 import com.paradisehotel.repository.PageableRoomRepository;
 import com.paradisehotel.repository.ReservationRepository;
 import com.paradisehotel.repository.RoomRepository;
@@ -40,6 +42,9 @@ public class ReservationResource {
 
     @Autowired
     ReservationRepository reservationRepository;
+
+    @Autowired
+    ClientRepository clientRepository;
 
     @Autowired
     ConversionService conversionService;
@@ -125,12 +130,19 @@ public class ReservationResource {
                 return new ResponseEntity<ReservationResponse>(reservationResponse, HttpStatus.OK);
             }
         //End - Validation
+
         ReservationEntity reservationEntity = conversionService.convert(reservationRequest, ReservationEntity.class);
         reservationRepository.save(reservationEntity);
 
         roomEntity.addReservationEntity(reservationEntity);
         roomRepository.save(roomEntity);
+
+        ClientEntity clientEntity = conversionService.convert(reservationRequest, ClientEntity.class);
+        clientEntity.addReservationEntity(reservationEntity);
+        clientRepository.save(clientEntity);
+
         reservationEntity.setRoomEntity(roomEntity);
+        reservationEntity.setClientEntity(clientEntity);
 
         reservationResponse = conversionService.convert(reservationEntity, ReservationResponse.class);
         //reservationResponse.setRoomNumber(roomEntity.getRoomNumber());

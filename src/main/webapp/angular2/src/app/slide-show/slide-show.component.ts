@@ -1,5 +1,3 @@
-
-
 import {Component, OnInit} from '@angular/core';
 
 @Component({
@@ -25,7 +23,5 @@ export class SlideShowComponent implements OnInit {
     let index = this.slideIndex;
     this.slideIndex = ++index % this.imgURLArr.length;
     this.currentImgURL = this.imgURLArr[this.slideIndex];
-
   }
-
 }

@@ -18,21 +18,26 @@ public class H2Bootstrap implements CommandLineRunner {
 
         System.out.println("Bootstrapping data: ");
 
-        roomRepository.save(new RoomEntity(405, "200", RoomType.TWIN));
-        roomRepository.save(new RoomEntity(406, "150", RoomType.SINGLE));
-        roomRepository.save(new RoomEntity(407, "180", RoomType.DOUBLE));
-        roomRepository.save(new RoomEntity(408, "180", RoomType.DOUBLE));
-        roomRepository.save(new RoomEntity(409, "180", RoomType.DOUBLE));
-        roomRepository.save(new RoomEntity(410, "150", RoomType.SINGLE));
-        roomRepository.save(new RoomEntity(411, "300", RoomType.PRESIDENTIAL));
-        roomRepository.save(new RoomEntity(412, "250", RoomType.FAMILY));
-        roomRepository.save(new RoomEntity(413, "250", RoomType.FAMILY));
-        roomRepository.save(new RoomEntity(414, "250", RoomType.FAMILY));
-        roomRepository.save(new RoomEntity(415, "150", RoomType.SINGLE));
-        roomRepository.save(new RoomEntity(416, "180", RoomType.DOUBLE));
-        roomRepository.save(new RoomEntity(417, "180", RoomType.DOUBLE));
-        roomRepository.save(new RoomEntity(418, "200", RoomType.TWIN));
-        roomRepository.save(new RoomEntity(419, "200", RoomType.TWIN));
+        roomRepository.save(new RoomEntity(100, "150", RoomType.SINGLE));
+        roomRepository.save(new RoomEntity(101, "300", RoomType.PRESIDENTIAL));
+        roomRepository.save(new RoomEntity(102, "180", RoomType.DOUBLE));
+        roomRepository.save(new RoomEntity(103, "200", RoomType.TWIN));
+        roomRepository.save(new RoomEntity(104, "250", RoomType.FAMILY));
+        roomRepository.save(new RoomEntity(105, "200", RoomType.TWIN));
+        roomRepository.save(new RoomEntity(106, "150", RoomType.SINGLE));
+        roomRepository.save(new RoomEntity(107, "180", RoomType.DOUBLE));
+        roomRepository.save(new RoomEntity(108, "180", RoomType.DOUBLE));
+        roomRepository.save(new RoomEntity(109, "180", RoomType.DOUBLE));
+        roomRepository.save(new RoomEntity(110, "150", RoomType.SINGLE));
+        roomRepository.save(new RoomEntity(111, "300", RoomType.PRESIDENTIAL));
+        roomRepository.save(new RoomEntity(112, "250", RoomType.FAMILY));
+        roomRepository.save(new RoomEntity(113, "250", RoomType.FAMILY));
+        roomRepository.save(new RoomEntity(114, "250", RoomType.FAMILY));
+        roomRepository.save(new RoomEntity(115, "150", RoomType.SINGLE));
+        roomRepository.save(new RoomEntity(116, "180", RoomType.DOUBLE));
+        roomRepository.save(new RoomEntity(117, "180", RoomType.DOUBLE));
+        roomRepository.save(new RoomEntity(118, "200", RoomType.TWIN));
+        roomRepository.save(new RoomEntity(119, "200", RoomType.TWIN));
 
         Iterable<RoomEntity> itr = roomRepository.findAll();
 

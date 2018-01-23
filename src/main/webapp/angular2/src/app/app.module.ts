@@ -10,6 +10,7 @@ import {SlideShowComponent} from './slide-show/slide-show.component';
 import {GalleryComponent} from './gallery/gallery.component';
 import {MapComponent} from './map/map.component';
 import {EnquireFormComponent} from './enquire-form/enquire-form.component';
+import {SearchComponent} from './search/search.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import {EnquireFormComponent} from './enquire-form/enquire-form.component';
     SlideShowComponent,
     GalleryComponent,
     MapComponent,
-    EnquireFormComponent
+    EnquireFormComponent,
+    SearchComponent
   ],
   imports: [
     BrowserModule,

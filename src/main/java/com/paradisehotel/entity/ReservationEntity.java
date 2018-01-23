@@ -25,6 +25,9 @@ public class ReservationEntity {
     //@JoinColumn(name = "room_entity")
     private RoomEntity roomEntity;
 
+    @ManyToOne
+    private ClientEntity clientEntity;
+
     public ReservationEntity() {
     }
 
@@ -38,9 +41,16 @@ public class ReservationEntity {
         return roomEntity;
     }
 
-
     public void setRoomEntity(RoomEntity roomEntity) {
         this.roomEntity = roomEntity;
+    }
+
+    public ClientEntity getClientEntity() {
+        return clientEntity;
+    }
+
+    public void setClientEntity(ClientEntity clientEntity) {
+        this.clientEntity = clientEntity;
     }
 
     public Long getRoom_id() {

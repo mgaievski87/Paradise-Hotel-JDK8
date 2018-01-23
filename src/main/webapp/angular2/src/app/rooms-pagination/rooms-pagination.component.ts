@@ -1,7 +1,6 @@
 import {Component, OnInit, OnChanges, Input} from '@angular/core';
 import {PaginationPage, PaginationPropertySort} from '../pagination';
 import {Table} from '../table';
-import {Observable} from 'rxjs/Observable';
 
 @Component ({
   selector: 'app-rooms-pagination',
@@ -30,23 +29,15 @@ export class RoomsPaginationComponent implements OnInit, OnChanges {
   }
 
   fetchPageNumber(pageNumber: number) {
-    console.log('fetchPageNumber() called with pageNumber = ' + pageNumber);
-    console.log('fetchPageNumber() called with this.page.size = ' + this.page.size);
-    console.log('fetchPageNumber() called with this.getSort() = ' + this.getSort());
-
     this.table.searchRooms(pageNumber - 1, this.page.size, this.getSort());
     console.log('fetchPageNumber() finished');
   }
-
-
-
   fetchNextPage() {
     if (this.page.number + 1 >= this.page.totalPages) {
       return;
     }
     this.table.searchRooms(this.page.number + 1, this.page.size, this.getSort());
   }
-
   fetchPreviousPage() {
     if (this.page.number === 0) {
       return;
@@ -61,6 +52,5 @@ export class RoomsPaginationComponent implements OnInit, OnChanges {
       return null;
     }
   }
-
 }
 

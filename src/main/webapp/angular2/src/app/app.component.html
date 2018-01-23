@@ -1,7 +1,4 @@
-
-
 <header id="header-part">
-
   <nav class="navbar navbar-fixed-top">
     <div class="navbar-inverse">
       <div id="navbar_container" class="container">
@@ -12,67 +9,53 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <button id="navbar-reserveBtn" type="button" class="btn btn-lg btn-primary" data-toggle="collapse" data-target="#booking-section">
+          <button id="navbar-reserveBtn" type="button" class="btn btn-lg btn-primary" (click)="toggleBookingSection()">
             Reserve
           </button>
           <a id="paradise-logo" class="navbar-brand" href="#">Paradise Hotel</a>
         </div>
-
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li><a href="#">Home</a></li>
+            <li><a class="navbar_link" href="#">Home</a></li>
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Services</a>
+              <a href="#" class="navbar_link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Services</a>
               <ul class="dropdown-menu">
-                <li class="dropdown-menu_item"><a id="dropdown-menu_item_link" href="#generalInfo-section">General Information</a></li>
-                <li class="dropdown-menu_item"><a href="#dining-section">Dining</a></li>
-                <li class="dropdown-menu_item"><a href="#specialEvents-section">Special Events</a></li>
+                <li class="dropdown-menu_item"><a class="navbar_link" id="dropdown-menu_item_link" href="#generalInfo-section">General Information</a></li>
+                <li class="dropdown-menu_item"><a class="navbar_link" href="#dining-section">Dining</a></li>
+                <li class="dropdown-menu_item"><a class="navbar_link" href="#specialEvents-section">Special Events</a></li>
               </ul>
             </li>
-
-            <li><a href="#gallary-section">Gallery</a></li>
-
+            <li><a class="navbar_link" href="#gallary-section">Gallery</a></li>
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Contact Us</a>
+              <a href="#" class="navbar_link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Contact Us</a>
               <ul class="dropdown-menu">
-                <li class="dropdown-menu_item"><a href="#location-section">Location</a></li>
-                <li class="dropdown-menu_item"><a href="#enquireNow-section">Enquire Now</a></li>
+                <li class="dropdown-menu_item"><a class="navbar_link" href="#location-section">Location</a></li>
+                <li class="dropdown-menu_item"><a class="navbar_link" href="#enquireNow-section">Enquire Now</a></li>
               </ul>
             </li>
           </ul>
-          <div class="search-container">
-            <form>
-              <input type="text" placeholder="Search..." name="search">
-              <button type="submit"><i class="fa fa-search"></i></button>
-            </form>
-          </div>
+          <app-search></app-search>
         </div>
-
       </div>
-
     </div>
-    <section class="collapse" id="booking-section">
+    <section *ngIf="showBookingSection" id="booking-section">
       <article class="container">
-        <div class="row" *ngIf="bookingResultMessage">
-          <h2 id="bookingResultMessage" class="booking-form-label">{{bookingResultMessage}}</h2>
+        <div class="row" *ngIf="searchResultMessage">
+          <h5 class="bookingResultMessage">{{searchResultMessage}}</h5>
         </div>
-        <form class="form-horizontal" [formGroup]="roomsearch"
+        <form class="form-horizontal" [formGroup]="roomsearch" #searchRoomsForm="ngForm"
               (ngSubmit)="searchRooms(currentPageNumber, currentPageSize, currentSort)">
-
           <div class="form-group">
             <div class="col-sm-2"></div>
             <label for="checkin" class="col-sm-1 booking-form-label">Check-In:</label>
             <div class="col-sm-3">
               <input id="checkin" type="date" name="checkinDate" [ngModel]="checkinDate | date: 'yyyy-MM-dd'" class="form-control" formControlName="checkin" />
             </div>
-
             <label for="checkout" class="col-sm-1 booking-form-label">Check-Out:</label>
             <div class="col-sm-3">
               <input id="checkout" type="date" name="checkoutDate" [ngModel]="checkoutDate | date: 'yyyy-MM-dd'" class="form-control" formControlName="checkout" />
             </div>
-
           </div>
-
           <div class="form-group">
             <div class="col-sm-2"></div>
             <label for="showParam" class="col-sm-1 booking-form-label">Show: </label>
@@ -82,7 +65,6 @@
                 <option value="all">All</option>
               </select>
             </div>
-
             <label for="sortByParam" class="col-sm-1 booking-form-label">Sort by: </label>
             <div class="col-sm-2">
               <select id="sortByParam" class="form-control" formControlName="sortBy">
@@ -101,25 +83,19 @@
                 <option value="10">10</option>
                 <option value="15">15</option>
               </select>
-
             </div>
-
           </div>
           <div class="form-group">
             <div id="booking-form-SearchBtn-container">
-                <button type="submit" id="booking-form-SearchBtn" class="btn btn-primary form-control" data-toggle="collapse" data-target="#booking-section">Search</button>
+              <button type="submit" id="booking-form-SearchBtn" class="btn btn-primary form-control" [disabled]="searchRoomsForm.invalid">Search</button>
             </div>
           </div>
         </form>
-
       </article>
     </section><!-- booking-section -->
   </nav>
-
 </header>
 <main id="main-part">
-
-
   <!-- Showing loading spinner *ngIf="showSpinner" -->
   <div class="spinnerContainer" *ngIf="showSpinner">
       <div class="sk-fading-circle">
@@ -137,50 +113,105 @@
         <div class="sk-circle12 sk-circle"></div>
       </div>
   </div>
-
   <div id="wallpapers">
     <app-slide-show></app-slide-show>
   </div>
 
-  <section id="searchResult-section" class="main_section" style="border: 1px solid black" *ngIf="roomsPage">
-
+  <section id="searchResult-section" class="main_section" *ngIf="roomsPage">
     <h1 class="section-header">Rooms</h1>
     <ul id="room_list">
-      <li class="room-row" *ngFor="let room of roomsPage.content">
-        <div class="room-row_item">
-          <div class="room-row_item_content" [ngClass]="{'room_thumb_container-bookedOut': !room.available}">
-            <img [ngClass]="{'room_thumb_img-bookedOut': !room.available}" src="{{room.imgURL}}" alt="Intro Gallery Room Sample Pictures">
-            <h3 *ngIf="!room.available" [ngClass]="{'room_thumb_text-bookedOut': !room.available}">Booked Out</h3>
+      <li *ngFor="let room of roomsPage.content">
+        <div class="room-row">
+          <div class="room-row_item">
+            <div class="room-row_item_content" [ngClass]="{'room_thumb_container-bookedOut': !room.available}">
+              <img [ngClass]="{'room_thumb_img-bookedOut': !room.available}" src="{{room.imgURL}}" alt="Intro Gallery Room Sample Pictures">
+              <h3 *ngIf="!room.available" [ngClass]="{'room_thumb_text-bookedOut': !room.available}">Booked Out</h3>
+            </div>
+          </div>
+          <div class="room-row_item">
+            <strong>Room #: {{room.roomNumber}}</strong><br />
+          </div>
+          <div class="room-row_item">
+            <strong>Type: {{room.roomType}}</strong><br />
+          </div>
+          <div class="room-row_item">
+            <strong>Description: {{room.description}}</strong><br />
+          </div>
+          <div class="room-row_item">
+            <strong>Price: ${{room.price}}</strong>
+          </div>
+          <div class="room-row_item">
+            <button type="submit" class="btn btn-primary" *ngIf="room.available && !isInBuffer(room.id) && room.id!==currentRoomId" (click)="setCurrentRoomId(room.id)">Reserve</button>
           </div>
         </div>
-        <div class="room-row_item">
-          <strong>Room #: {{room.roomNumber}}</strong><br />
-        </div>
-        <div class="room-row_item">
-          <strong>Type: {{room.roomType}}</strong><br />
-        </div>
-        <div class="room-row_item">
-          <strong>Description: {{room.description}}</strong><br />
-        </div>
-        <div class="room-row_item">
-          <strong>Price: ${{room.price}}</strong>
-        </div>
-
-        <div class="room-row_item">
-          <!-- <div>{{bookingResultMessage}}</div>-->
-          <button type="submit" class="btn btn-primary" *ngIf="room.available && showReserveBtn(room.id)" (click)="reserveRoom(room.id)">Reserve</button>
+        <div *ngIf="showReservationForm(room.id)">
+          <!--Beginning -- Reservation_client-details_form -->
+          <form class="container" id="reservation-form" [formGroup]="roomReserve" #reservationForm="ngForm" (ngSubmit)="reserveRoom(room.id)">
+            <div [hidden]="reservationForm.submitted">
+              <div class="form-row">
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label for = "clientFirstName">First name:</label>
+                    <input type="text" class="form-control" id="clientFirstName" formControlName="clientFirstName" placeholder="First name" required />
+                    <div *ngIf="clientFirstName !== undefined && clientFirstName.invalid && (clientFirstName.dirty || clientFirstName.touched)" class="alert alert-danger">
+                      <div *ngIf="clientFirstName !== undefined && clientFirstName.errors.required">First name is required.</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label for = "clientLastName">Last name:</label>
+                    <input type="text" class="form-control" id="clientLastName" formControlName="clientLastName" placeholder="Last name" required />
+                    <div *ngIf="clientLastName !== undefined && clientLastName.invalid && (clientLastName.dirty || clientLastName.touched)" class="alert alert-danger">
+                      <div *ngIf="clientLastName !== undefined && clientLastName.errors.required">Last name is required.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label for = "clientEmail">Email:</label>
+                    <input type="email" class="form-control" id="clientEmail" formControlName="clientEmail" placeholder="Email" required />
+                    <div *ngIf="clientEmail !== undefined && clientEmail.invalid && (clientEmail.dirty || clientEmail.touched)" class="alert alert-danger">
+                      <div *ngIf="clientEmail !== undefined && clientEmail.errors.required">Valid email is required.</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label for = "clientPhone">Phone:</label>
+                    <input type="tel" class="form-control" id="clientPhone" formControlName="clientPhone" placeholder="Phone" required />
+                    <div *ngIf="clientPhone !== undefined && clientPhone.invalid && (clientPhone.dirty || clientPhone.touched)" class="alert alert-danger">
+                      <div *ngIf="clientPhone !== undefined && clientPhone.errors.required">Phone is required.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="col-sm-offset-3 col-sm-6">
+                  <div class="buttons-container">
+                    <button type="reset" class="btn btn-primary mb-2" (click)="resetReservationForm()">Go back</button>
+                    <button type="submit" class="btn btn-primary mb-2" [disabled]="reservationForm.invalid">Submit</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+          <div *ngIf="reservationForm.submitted">
+            <h2 class="bookingResultMessage" >{{bookingResultMessage}}</h2>
+          </div>
+        <!--END -- Reservation_client-details_form -->
         </div>
       </li>
     </ul>
-
 
       <!-- Inserting Pagination component 'rooms-pagination.component' -->
       <div *ngIf="self">
         <app-rooms-pagination [table]="self" [page]="roomsPage"></app-rooms-pagination>
       </div>
+    <!--END-- Inserting Pagination component 'rooms-pagination.component' -->
   </section>
-
-
 
   <section class="main_section" id="generalInfo-section">
     <h1 class="section-header">General Information</h1>
@@ -244,7 +275,7 @@
         </ul>
       </section>
     </article>
-    <article id="greenprogram">
+    <article id="greenprogram" class="standOutContainer">
       <h2 class="section_subheader">Green Program</h2>
       <p><strong>The Paradise Hotel - Vinnytsia</strong> was recently renovated, and we considered the impact on the earth
         the entire way. From green building materials, to solar power, to energy-friendly lighting and appliances
@@ -256,7 +287,7 @@
 
   <section class="main_section" id="dining-section">
     <h1 class="section-header">Dining</h1>
-    <p>Vinnytsia is a foodie’s paradise, and the Paradise Hotel is in the center of it all. With options for
+    <p id="diningDescription">Vinnytsia is a foodie’s paradise, and the Paradise Hotel is in the center of it all. With options for
       traditional English, Italian, Indian, American, Chinese, and French cuisines, all within two blocks of the
       hotel, and a variety of tasty culinary delights from many other countries, within a half-mile radius, the only
       trouble you’ll have is choosing! </p>
@@ -298,8 +329,8 @@
 
   <section class="main_section" id="specialEvents-section">
     <h1 class="section-header">Special Events</h1>
-
   </section>
+
   <section class="main_section" id="gallary-section">
     <h1 class="section-header">Gallary</h1>
     <app-gallary></app-gallary>

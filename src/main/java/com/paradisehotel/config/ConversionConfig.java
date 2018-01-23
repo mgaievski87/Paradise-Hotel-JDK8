@@ -1,6 +1,7 @@
 package com.paradisehotel.config;
 
 import com.paradisehotel.convertor.ReservationEntityToReservationResponseConverter;
+import com.paradisehotel.convertor.ReservationRequestToClientEntityConverter;
 import com.paradisehotel.convertor.ReservationRequestToReservationEntityConverter;
 import com.paradisehotel.convertor.RoomEntityToReservableRoomResponseConverter;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +21,7 @@ public class ConversionConfig {
         converters.add(new RoomEntityToReservableRoomResponseConverter());
         converters.add(new ReservationRequestToReservationEntityConverter());
         converters.add(new ReservationEntityToReservationResponseConverter());
+        converters.add(new ReservationRequestToClientEntityConverter());
 
         return converters;
     }
