@@ -1,4 +1,7 @@
 @import url(http://fonts.googleapis.com/css?family=Exo+2:400,200,600,800);
+* {
+  font-size: 16px;
+}
 #main-part {
   padding-bottom: 2em;
 }
@@ -11,7 +14,7 @@
 }
 #navbar-reserveBtn {
   margin-left: 1em;
-  margin-top: 0.2ex;
+  margin-top: 0.3rem;
   color: white;
   float: right;
 }
@@ -20,7 +23,7 @@
   margin: 0;
 }
 .navbar_link {
-  font-size: 1.2em;
+  font-size: 1em;
 }
 .bookingResultMessage {
   text-align: center;
@@ -97,6 +100,7 @@
 }
 #searchResult-section .bookingResultMessage {
   color: darkslateblue;
+  font-size: 3rem;
 }
 .main_section_img {
   max-width: 100%;
@@ -194,12 +198,12 @@
 }
 .room_thumb_text-bookedOut {
   color: white;
-  top: calc(50% - calc(1em/2));
+  top: calc(50% - (1rem/2));
   width: 100%;
   text-align: center;
   position: absolute;
   z-index: 1;
-  font: bold 2vw Arial;
+  font: bold 2rem Arial;
   margin: 0 auto;
 }
 

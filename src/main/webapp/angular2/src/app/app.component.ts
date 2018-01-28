@@ -121,17 +121,19 @@ export class AppComponent implements OnInit, Table<Room> {
 
   getAll(pageNumber: number, pageSize: number, sort: PaginationPropertySort): Observable<PaginationPage<Room>> {
     let params = new URLSearchParams();
+    params.set('checkin', `${this.currentCheckInVal}`);
+    params.set('checkout', `${this.currentCheckOutVal}`);
+    params.set('showParam', `${this.currentShowParamVal}`);
     params.set('size', `${pageSize}`);
     params.set('page', `${pageNumber}`);
     if (sort !== null) {
       params.set('sort', `${sort.property},${sort.direction}`);
     }
-    let options = new RequestOptions({
+    const options = new RequestOptions({
       search: params
     });
-    return this.http.get(this.baseUrl + '/room/reservation/v1?checkin=' + this.currentCheckInVal + '&checkout=' + this.currentCheckOutVal + '&showParam=' + this.currentShowParamVal, options)
+    return this.http.get(this.baseUrl + '/room/reservation/v1', options)
       .map(response => response.json());
-
   }
 
   reserveRoom(roomId: string) {
